@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="006-create-sales" author="billbharat">
+        <createTable tableName="sales">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="merchant_id" type="UUID"/>
+            <column name="coupon_id" type="UUID"/>
+            <column name="amount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_amount" type="DECIMAL(12,2)" defaultValueNumeric="0"/>
+            <column name="final_amount" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sale_time" type="TIMESTAMP"/>
+            <column name="invoice_number" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="payment_method" type="VARCHAR(20)" defaultValue="CASH">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="COMPLETED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_details" type="TEXT"/>
+            <column name="notes" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="sales" indexName="idx_sales_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="sales" indexName="idx_sales_created_at">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

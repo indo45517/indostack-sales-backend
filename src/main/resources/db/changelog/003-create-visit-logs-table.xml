@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-create-visit-logs" author="billbharat">
+        <createTable tableName="visit_logs">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="merchant_id" type="UUID"/>
+            <column name="shop_name" type="VARCHAR(200)"/>
+            <column name="owner_name" type="VARCHAR(100)"/>
+            <column name="phone_number" type="VARCHAR(15)"/>
+            <column name="latitude" type="DECIMAL(10,7)"/>
+            <column name="longitude" type="DECIMAL(10,7)"/>
+            <column name="visit_time" type="TIMESTAMP"/>
+            <column name="photo_url" type="VARCHAR(500)"/>
+            <column name="notes" type="TEXT"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="VISITED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="purpose" type="VARCHAR(100)"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="visit_logs" indexName="idx_visit_user">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

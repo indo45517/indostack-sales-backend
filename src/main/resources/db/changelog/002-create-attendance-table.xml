@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-create-attendance" author="billbharat">
+        <createTable tableName="attendance_records">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="check_in_time" type="TIMESTAMP"/>
+            <column name="check_out_time" type="TIMESTAMP"/>
+            <column name="check_in_latitude" type="DECIMAL(10,7)"/>
+            <column name="check_in_longitude" type="DECIMAL(10,7)"/>
+            <column name="check_out_latitude" type="DECIMAL(10,7)"/>
+            <column name="check_out_longitude" type="DECIMAL(10,7)"/>
+            <column name="attendance_date" type="DATE"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="CHECKED_IN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="attendance_records" indexName="idx_attendance_user">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="attendance_records" indexName="idx_attendance_date">
+            <column name="attendance_date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <include file="db/changelog/001-create-users-table.xml"/>
+    <include file="db/changelog/002-create-attendance-table.xml"/>
+    <include file="db/changelog/003-create-visit-logs-table.xml"/>
+    <include file="db/changelog/004-create-merchants-table.xml"/>
+    <include file="db/changelog/005-create-coupons-table.xml"/>
+    <include file="db/changelog/006-create-sales-table.xml"/>
+    <include file="db/changelog/007-create-deliveries-table.xml"/>
+    <include file="db/changelog/008-create-territories-table.xml"/>
+    <include file="db/changelog/009-create-tasks-table.xml"/>
+    <include file="db/changelog/010-create-badges-table.xml"/>
+    <include file="db/changelog/011-create-achievements-table.xml"/>
+    <include file="db/changelog/012-create-notifications-table.xml"/>
+    <include file="db/changelog/013-create-inventory-tables.xml"/>
+    <include file="db/changelog/014-create-commissions-table.xml"/>
+    <include file="db/changelog/015-create-announcements-table.xml"/>
+
+</databaseChangeLog>

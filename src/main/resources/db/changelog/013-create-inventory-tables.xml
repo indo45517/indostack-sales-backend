@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="013-create-inventory" author="billbharat">
+        <createTable tableName="inventory_items">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="sku" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_stock" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="minimum_stock" type="INTEGER" defaultValueNumeric="10"/>
+            <column name="unit" type="VARCHAR(20)" defaultValue="pcs"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createTable tableName="inventory_requests">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="requested_by" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_item_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_requested" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_approved" type="INTEGER"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="approved_by" type="UUID"/>
+            <column name="approved_at" type="TIMESTAMP"/>
+            <column name="notes" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
