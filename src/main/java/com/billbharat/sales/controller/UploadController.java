@@ -35,12 +35,24 @@ public class UploadController {
     public ResponseEntity<Map<String, Object>> uploadImage(
             @RequestParam("file") MultipartFile file) {
         try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path uploadPath = Paths.get(uploadDir);
+            // Sanitize filename: strip any path separators and use only the base name
+            String originalName = file.getOriginalFilename();
+            String safeName = (originalName != null && !originalName.isBlank())
+                    ? Paths.get(originalName).getFileName().toString().replaceAll("[^a-zA-Z0-9._-]", "_")
+                    : "upload";
+            String fileName = UUID.randomUUID() + "_" + safeName;
+
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            Path filePath = uploadPath.resolve(fileName);
+            Path filePath = uploadPath.resolve(fileName).normalize();
+
+            // Ensure resolved path is inside the upload directory (prevent path traversal)
+            if (!filePath.startsWith(uploadPath)) {
+                return ResponseEntity.badRequest()
+                        .body(ResponseUtil.error("Invalid file name"));
+            }
             Files.write(filePath, file.getBytes());
 
             Map<String, Object> result = new HashMap<>();
