@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -27,4 +28,9 @@ public interface VisitLogRepository extends JpaRepository<VisitLog, UUID> {
     long countByUserIdAndVisitDate(@Param("userId") UUID userId,
                                    @Param("start") LocalDateTime start,
                                    @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(v) FROM VisitLog v WHERE v.userId IN :userIds AND v.createdAt BETWEEN :start AND :end")
+    long countByUserIdsAndCreatedAtBetween(@Param("userIds") List<UUID> userIds,
+                                           @Param("start") LocalDateTime start,
+                                           @Param("end") LocalDateTime end);
 }
