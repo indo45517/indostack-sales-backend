@@ -127,12 +127,16 @@ public class SalesServiceImpl implements SalesService {
 
         // Record commission if applicable
         if (hasCommission && commissionAmount.compareTo(BigDecimal.ZERO) > 0) {
+            // Commission rate stored as percentage of final amount for reporting
+            BigDecimal commissionRate = finalAmount.compareTo(BigDecimal.ZERO) > 0
+                    ? commissionAmount.divide(finalAmount, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"))
+                    : BigDecimal.ZERO;
             Commission commission = Commission.builder()
                     .userId(userId)
                     .saleId(savedSale.getId())
                     .commissionType(Commission.CommissionType.SALE)
                     .baseAmount(finalAmount)
-                    .commissionRate(BigDecimal.ZERO)
+                    .commissionRate(commissionRate)
                     .commissionAmount(commissionAmount)
                     .status(Commission.Status.PENDING)
                     .build();

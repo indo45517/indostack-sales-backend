@@ -27,7 +27,7 @@ public class CreateProductRequest {
     private BigDecimal sellingPrice;
 
     @NotNull(message = "hasCommission is required")
-    private Boolean hasCommission;
+    private Boolean hasCommission = false;
 
     private BigDecimal commissionAmount;
 
