@@ -46,6 +46,9 @@ public class Territory {
     @Column(name = "radius_km")
     private Double radiusKm;
 
+    @Column(name = "boundaries_json", columnDefinition = "TEXT")
+    private String boundariesJson;
+
     @Column(name = "is_active")
     @Builder.Default
     private boolean isActive = true;

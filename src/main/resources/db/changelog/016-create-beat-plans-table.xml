@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="016-create-beat-plans" author="billbharat">
+        <createTable tableName="beat_plans">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="beat_name" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="territory_id" type="UUID"/>
+            <column name="executive_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="team_lead_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="visit_target" type="INTEGER" defaultValue="0"/>
+            <column name="sales_target" type="DECIMAL(15,2)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="NOT_STARTED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="beat_plans" indexName="idx_beat_plans_team_lead">
+            <column name="team_lead_id"/>
+        </createIndex>
+        <createIndex tableName="beat_plans" indexName="idx_beat_plans_executive">
+            <column name="executive_id"/>
+        </createIndex>
+        <createIndex tableName="beat_plans" indexName="idx_beat_plans_date">
+            <column name="date"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

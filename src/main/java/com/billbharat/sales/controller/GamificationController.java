@@ -1,5 +1,6 @@
 package com.billbharat.sales.controller;
 
+import com.billbharat.sales.dto.request.AwardBadgeRequest;
 import com.billbharat.sales.entity.User;
 import com.billbharat.sales.exception.UnauthorizedException;
 import com.billbharat.sales.repository.UserRepository;
@@ -8,6 +9,7 @@ import com.billbharat.sales.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/sales")
@@ -64,5 +67,21 @@ public class GamificationController {
     @Operation(summary = "Get badge leaderboard")
     public ResponseEntity<Map<String, Object>> getBadgeLeaderboard() {
         return ResponseEntity.ok(ResponseUtil.success("Badge leaderboard", java.util.List.of()));
+    }
+
+    @PostMapping("/gamification/badges/award")
+    @Operation(summary = "Award a badge to an executive")
+    public ResponseEntity<Map<String, Object>> awardBadge(@Valid @RequestBody AwardBadgeRequest request) {
+        var result = gamificationService.awardBadge(getCurrentUser().getId(), request);
+        return ResponseEntity.ok(ResponseUtil.success("Badge awarded", result));
+    }
+
+    @GetMapping("/gamification/leaderboard/team")
+    @Operation(summary = "Get team badge leaderboard")
+    public ResponseEntity<Map<String, Object>> getTeamLeaderboard(
+            @RequestParam(defaultValue = "MONTHLY") String period,
+            @RequestParam(required = false) UUID teamId) {
+        var leaderboard = gamificationService.getTeamLeaderboard(period, teamId);
+        return ResponseEntity.ok(ResponseUtil.success("Team leaderboard", leaderboard));
     }
 }

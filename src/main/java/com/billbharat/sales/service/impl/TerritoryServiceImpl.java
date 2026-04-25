@@ -1,11 +1,14 @@
 package com.billbharat.sales.service.impl;
 
+import com.billbharat.sales.dto.request.TerritoryAssignRequest;
+import com.billbharat.sales.dto.request.TerritoryBoundariesRequest;
 import com.billbharat.sales.dto.request.TerritoryRequest;
 import com.billbharat.sales.dto.response.TerritoryResponse;
 import com.billbharat.sales.entity.Territory;
 import com.billbharat.sales.exception.ResourceNotFoundException;
 import com.billbharat.sales.repository.TerritoryRepository;
 import com.billbharat.sales.service.TerritoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -21,6 +26,7 @@ import java.util.UUID;
 public class TerritoryServiceImpl implements TerritoryService {
 
     private final TerritoryRepository territoryRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,5 +82,45 @@ public class TerritoryServiceImpl implements TerritoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", id));
         territory.setActive(false);
         territoryRepository.save(territory);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> updateBoundaries(UUID territoryId, TerritoryBoundariesRequest request) {
+        Territory territory = territoryRepository.findById(territoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", territoryId));
+
+        String boundariesJson;
+        try {
+            boundariesJson = objectMapper.writeValueAsString(request.getBoundaries());
+        } catch (Exception e) {
+            boundariesJson = "[]";
+        }
+        territory.setBoundariesJson(boundariesJson);
+        territoryRepository.save(territory);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", territory.getId().toString());
+        result.put("name", territory.getName());
+        result.put("boundaries", request.getBoundaries());
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> assignExecutive(UUID territoryId, TerritoryAssignRequest request) {
+        Territory territory = territoryRepository.findById(territoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", territoryId));
+
+        territory.setAssignedTo(UUID.fromString(request.getExecutiveId()));
+        territoryRepository.save(territory);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", territory.getId().toString());
+        result.put("name", territory.getName());
+        result.put("assignedTo", request.getExecutiveId());
+        result.put("startDate", request.getStartDate());
+        result.put("endDate", request.getEndDate());
+        return result;
     }
 }
