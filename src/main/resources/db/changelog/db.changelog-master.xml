@@ -20,5 +20,8 @@
     <include file="db/changelog/013-create-inventory-tables.xml"/>
     <include file="db/changelog/014-create-commissions-table.xml"/>
     <include file="db/changelog/015-create-announcements-table.xml"/>
+    <include file="db/changelog/016-create-beat-plans-table.xml"/>
+    <include file="db/changelog/017-create-training-tables.xml"/>
+    <include file="db/changelog/018-add-territory-boundaries.xml"/>
 
 </databaseChangeLog>

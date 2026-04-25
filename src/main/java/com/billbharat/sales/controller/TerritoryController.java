@@ -1,5 +1,7 @@
 package com.billbharat.sales.controller;
 
+import com.billbharat.sales.dto.request.TerritoryAssignRequest;
+import com.billbharat.sales.dto.request.TerritoryBoundariesRequest;
 import com.billbharat.sales.dto.request.TerritoryRequest;
 import com.billbharat.sales.service.TerritoryService;
 import com.billbharat.sales.util.ResponseUtil;
@@ -55,5 +57,23 @@ public class TerritoryController {
     public ResponseEntity<Map<String, Object>> deleteTerritory(@PathVariable UUID id) {
         territoryService.deleteTerritory(id);
         return ResponseEntity.ok(ResponseUtil.success("Territory deleted", null));
+    }
+
+    @PutMapping("/{territoryId}/boundaries")
+    @Operation(summary = "Update territory boundaries")
+    public ResponseEntity<Map<String, Object>> updateBoundaries(
+            @PathVariable UUID territoryId,
+            @Valid @RequestBody TerritoryBoundariesRequest request) {
+        var result = territoryService.updateBoundaries(territoryId, request);
+        return ResponseEntity.ok(ResponseUtil.success("Territory boundaries updated", result));
+    }
+
+    @PostMapping("/{territoryId}/assign")
+    @Operation(summary = "Assign executive to territory")
+    public ResponseEntity<Map<String, Object>> assignExecutive(
+            @PathVariable UUID territoryId,
+            @Valid @RequestBody TerritoryAssignRequest request) {
+        var result = territoryService.assignExecutive(territoryId, request);
+        return ResponseEntity.ok(ResponseUtil.success("Executive assigned to territory", result));
     }
 }
