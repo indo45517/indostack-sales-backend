@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmployeeId(String employeeId);
     List<User> findByRole(User.Role role);
     List<User> findByTeamLeadId(UUID teamLeadId);
+    List<User> findByTerritoryAndRole(String territory, User.Role role);
     long countByRole(User.Role role);
     long countByRoleAndIsActive(User.Role role, boolean isActive);
 }
