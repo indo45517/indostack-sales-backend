@@ -2,12 +2,18 @@ package com.billbharat.sales.service.impl;
 
 import com.billbharat.sales.dto.request.TerritoryAssignRequest;
 import com.billbharat.sales.dto.request.TerritoryBoundariesRequest;
+import com.billbharat.sales.dto.request.TerritoryRemoveRequest;
 import com.billbharat.sales.dto.request.TerritoryRequest;
+import com.billbharat.sales.dto.response.AdminExecutiveResponse;
 import com.billbharat.sales.dto.response.TerritoryResponse;
 import com.billbharat.sales.entity.Territory;
+import com.billbharat.sales.entity.User;
 import com.billbharat.sales.exception.ResourceNotFoundException;
+import com.billbharat.sales.repository.SaleRepository;
 import com.billbharat.sales.repository.TerritoryRepository;
+import com.billbharat.sales.repository.UserRepository;
 import com.billbharat.sales.service.TerritoryService;
+import com.billbharat.sales.util.DateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +40,8 @@ import java.util.UUID;
 public class TerritoryServiceImpl implements TerritoryService {
 
     private final TerritoryRepository territoryRepository;
+    private final UserRepository userRepository;
+    private final SaleRepository saleRepository;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -125,5 +139,76 @@ public class TerritoryServiceImpl implements TerritoryService {
         result.put("startDate", request.getStartDate());
         result.put("endDate", request.getEndDate());
         return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AdminExecutiveResponse> getTerritoryExecutives(UUID territoryId) {
+        Territory territory = territoryRepository.findById(territoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", territoryId));
+
+        List<User> executives = userRepository.findByTerritoryAndRole(
+                territory.getName(), User.Role.SALES_EXECUTIVE);
+
+        Map<UUID, User> leadMap = userRepository.findByRole(User.Role.SALES_LEAD)
+                .stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return executives.stream()
+                .map(exec -> toExecutiveResponse(exec, leadMap))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void removeExecutive(UUID territoryId, TerritoryRemoveRequest request) {
+        Territory territory = territoryRepository.findById(territoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", territoryId));
+
+        User executive = userRepository.findById(UUID.fromString(request.getExecutiveId()))
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.getExecutiveId()));
+
+        if (executive.getTerritory() != null && executive.getTerritory().equals(territory.getName())) {
+            executive.setTerritory(null);
+            userRepository.save(executive);
+        }
+    }
+
+    private AdminExecutiveResponse toExecutiveResponse(User executive, Map<UUID, User> leadMap) {
+        LocalDate today = DateUtil.today();
+        LocalDateTime monthStart = DateUtil.startOfMonth(today.getYear(), today.getMonthValue());
+        LocalDateTime monthEnd = DateUtil.endOfMonth(today.getYear(), today.getMonthValue());
+
+        long totalSales = saleRepository.countByUserIdAndCreatedAtBetween(executive.getId(), monthStart, monthEnd);
+        BigDecimal totalRevenue = saleRepository.sumFinalAmountByUserIdAndDateRange(executive.getId(), monthStart, monthEnd);
+        if (totalRevenue == null) totalRevenue = BigDecimal.ZERO;
+
+        User assignedLead = executive.getTeamLeadId() != null ? leadMap.get(executive.getTeamLeadId()) : null;
+        BigDecimal target = assignedLead != null && assignedLead.getTarget() != null
+                ? assignedLead.getTarget()
+                : BigDecimal.ZERO;
+        double achievementRate = target.compareTo(BigDecimal.ZERO) > 0
+                ? totalRevenue.divide(target, 4, RoundingMode.HALF_UP).doubleValue() * 100
+                : 0.0;
+
+        return AdminExecutiveResponse.builder()
+                .id(executive.getId().toString())
+                .name(executive.getName())
+                .phone(executive.getPhoneNumber())
+                .email(executive.getEmail())
+                .employeeId(executive.getEmployeeId())
+                .assignedLeadId(executive.getTeamLeadId() != null ? executive.getTeamLeadId().toString() : null)
+                .assignedLeadName(assignedLead != null ? assignedLead.getName() : null)
+                .territory(executive.getTerritory())
+                .dailyVisitTarget(executive.getDailyVisitTarget())
+                .dailyDemoTarget(executive.getDailyDemoTarget())
+                .dailyDeliveryTarget(executive.getDailyDeliveryTarget())
+                .commissionRate(executive.getCommissionRate())
+                .joinDate(executive.getJoinDate() != null ? executive.getJoinDate().toString() : null)
+                .isActive(executive.isActive())
+                .totalSales(totalSales)
+                .totalRevenue(totalRevenue)
+                .monthlyAchievementRate(achievementRate)
+                .build();
     }
 }
