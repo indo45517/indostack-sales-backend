@@ -34,14 +34,23 @@ public class BeatPlanServiceImpl implements BeatPlanService {
     @Transactional(readOnly = true)
     public Page<Map<String, Object>> getBeatPlans(UUID teamLeadId, LocalDate date, String status, Pageable pageable) {
         Page<BeatPlan> plans;
-        if (date != null && status != null) {
+        BeatPlan.Status beatStatus = null;
+        if (status != null) {
+            try {
+                beatStatus = BeatPlan.Status.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new com.billbharat.sales.exception.BadRequestException("Invalid status value: " + status);
+            }
+        }
+
+        if (date != null && beatStatus != null) {
             plans = beatPlanRepository.findByTeamLeadIdAndDateAndStatusOrderByCreatedAtDesc(
-                    teamLeadId, date, BeatPlan.Status.valueOf(status.toUpperCase()), pageable);
+                    teamLeadId, date, beatStatus, pageable);
         } else if (date != null) {
             plans = beatPlanRepository.findByTeamLeadIdAndDateOrderByCreatedAtDesc(teamLeadId, date, pageable);
-        } else if (status != null) {
+        } else if (beatStatus != null) {
             plans = beatPlanRepository.findByTeamLeadIdAndStatusOrderByDateDescCreatedAtDesc(
-                    teamLeadId, BeatPlan.Status.valueOf(status.toUpperCase()), pageable);
+                    teamLeadId, beatStatus, pageable);
         } else {
             plans = beatPlanRepository.findByTeamLeadIdOrderByDateDescCreatedAtDesc(teamLeadId, pageable);
         }

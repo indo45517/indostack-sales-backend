@@ -10,6 +10,7 @@ import com.billbharat.sales.repository.TerritoryRepository;
 import com.billbharat.sales.service.TerritoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TerritoryServiceImpl implements TerritoryService {
 
     private final TerritoryRepository territoryRepository;
@@ -94,6 +96,7 @@ public class TerritoryServiceImpl implements TerritoryService {
         try {
             boundariesJson = objectMapper.writeValueAsString(request.getBoundaries());
         } catch (Exception e) {
+            log.error("Failed to serialize territory boundaries for territory {}: {}", territoryId, e.getMessage());
             boundariesJson = "[]";
         }
         territory.setBoundariesJson(boundariesJson);

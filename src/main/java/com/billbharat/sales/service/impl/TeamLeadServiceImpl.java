@@ -281,14 +281,14 @@ public class TeamLeadServiceImpl implements TeamLeadService {
             topPerformers.get(i).put("rank", i + 1);
         }
 
-        long conversionRate = totalVisits > 0 ? (totalSales.longValue() / totalVisits) : 0;
+        long avgSalesPerVisit = totalVisits > 0 ? (totalSales.longValue() / totalVisits) : 0;
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalSales", totalSales);
         result.put("target", BigDecimal.ZERO);
         result.put("achievement", 0);
         result.put("totalVisits", totalVisits);
-        result.put("conversionRate", conversionRate);
+        result.put("conversionRate", avgSalesPerVisit);
         result.put("topPerformers", topPerformers.stream().limit(5).toList());
         result.put("salesTrend", List.of());
         return result;
@@ -315,7 +315,10 @@ public class TeamLeadServiceImpl implements TeamLeadService {
                     metrics.put("sales", totalSalesValue);
                     metrics.put("visits", visits);
                     metrics.put("conversionRate", 0);
-                    metrics.put("avgOrderValue", visits > 0 ? totalSalesValue.divide(BigDecimal.valueOf(visits), 2, java.math.RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                    BigDecimal avgOrderValue = visits > 0
+                            ? totalSalesValue.divide(BigDecimal.valueOf(visits), 2, java.math.RoundingMode.HALF_UP)
+                            : BigDecimal.ZERO;
+                    metrics.put("avgOrderValue", avgOrderValue);
 
                     Map<String, Object> exec = new HashMap<>();
                     exec.put("executiveId", user.getId().toString());
@@ -349,8 +352,14 @@ public class TeamLeadServiceImpl implements TeamLeadService {
         LocalDate dueDate = null;
         if (request.getDueDate() != null && !request.getDueDate().isBlank()) {
             try {
-                dueDate = LocalDate.parse(request.getDueDate().substring(0, 10));
-            } catch (Exception ignored) {
+                dueDate = LocalDate.parse(request.getDueDate(),
+                        java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+            } catch (java.time.format.DateTimeParseException e) {
+                try {
+                    dueDate = LocalDate.parse(request.getDueDate().substring(0, 10),
+                            java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
+                } catch (java.time.format.DateTimeParseException ignored) {
+                }
             }
         }
 

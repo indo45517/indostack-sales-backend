@@ -191,6 +191,7 @@ public class TeamLeadController {
     @Operation(summary = "Send bulk notifications to team members")
     public ResponseEntity<Map<String, Object>> sendBulkNotifications(
             @Valid @RequestBody BulkNotificationRequest request) {
+        // TODO: Integrate with a push notification provider (FCM/APNs) to send actual notifications
         Map<String, Object> result = new HashMap<>();
         result.put("sent", request.getRecipientIds() != null ? request.getRecipientIds().size() : 0);
         result.put("type", request.getType());
