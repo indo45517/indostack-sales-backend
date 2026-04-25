@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -58,6 +60,27 @@ public class User {
 
     @Column(name = "team_lead_id", columnDefinition = "uuid")
     private UUID teamLeadId;
+
+    @Column(name = "territory", length = 100)
+    private String territory;
+
+    @Column(name = "target", precision = 14, scale = 2)
+    private BigDecimal target;
+
+    @Column(name = "commission_rate", precision = 5, scale = 2)
+    private BigDecimal commissionRate;
+
+    @Column(name = "join_date")
+    private LocalDate joinDate;
+
+    @Column(name = "daily_visit_target")
+    private Integer dailyVisitTarget;
+
+    @Column(name = "daily_demo_target")
+    private Integer dailyDemoTarget;
+
+    @Column(name = "daily_delivery_target")
+    private Integer dailyDeliveryTarget;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)

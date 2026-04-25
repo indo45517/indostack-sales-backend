@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -32,4 +33,17 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
     java.util.List<Object[]> findLeaderboardByDateRange(@Param("start") LocalDateTime start,
                                                         @Param("end") LocalDateTime end,
                                                         Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(s.finalAmount), 0) FROM Sale s WHERE s.status = 'COMPLETED'")
+    BigDecimal sumAllFinalAmounts();
+
+    @Query("SELECT COALESCE(SUM(s.finalAmount), 0) FROM Sale s WHERE s.userId IN :userIds AND s.createdAt BETWEEN :start AND :end AND s.status = 'COMPLETED'")
+    BigDecimal sumFinalAmountByUserIdsAndDateRange(@Param("userIds") List<UUID> userIds,
+                                                   @Param("start") LocalDateTime start,
+                                                   @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(s) FROM Sale s WHERE s.userId IN :userIds AND s.createdAt BETWEEN :start AND :end")
+    long countByUserIdsAndCreatedAtBetween(@Param("userIds") List<UUID> userIds,
+                                           @Param("start") LocalDateTime start,
+                                           @Param("end") LocalDateTime end);
 }
