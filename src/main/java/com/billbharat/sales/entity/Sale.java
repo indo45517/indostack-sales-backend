@@ -62,6 +62,22 @@ public class Sale {
     @Builder.Default
     private Status status = Status.COMPLETED;
 
+    @Column(name = "product_id", columnDefinition = "uuid")
+    private UUID productId;
+
+    @Column(name = "product_name", length = 255)
+    private String productName;
+
+    @Column(name = "product_price", precision = 12, scale = 2)
+    private BigDecimal productPrice;
+
+    @Column(name = "has_commission")
+    @Builder.Default
+    private boolean hasCommission = false;
+
+    @Column(name = "commission_amount", precision = 12, scale = 2)
+    private BigDecimal commissionAmount;
+
     @Column(name = "product_details", columnDefinition = "TEXT")
     private String productDetails;
 

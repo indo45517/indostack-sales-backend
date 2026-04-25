@@ -14,6 +14,7 @@ public class SaleRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     private BigDecimal amount;
 
+    private String productId;
     private String merchantId;
     private String couponCode;
 

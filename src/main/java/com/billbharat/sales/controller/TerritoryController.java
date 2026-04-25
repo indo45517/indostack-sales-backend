@@ -44,6 +44,13 @@ public class TerritoryController {
         return ResponseEntity.ok(ResponseUtil.success("Territory created", response));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get territory by ID")
+    public ResponseEntity<Map<String, Object>> getTerritoryById(@PathVariable UUID id) {
+        var response = territoryService.getTerritoryById(id);
+        return ResponseEntity.ok(ResponseUtil.success("Territory retrieved", response));
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Update a territory")
     public ResponseEntity<Map<String, Object>> updateTerritory(

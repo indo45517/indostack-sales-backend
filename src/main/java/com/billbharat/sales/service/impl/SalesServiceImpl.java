@@ -4,11 +4,13 @@ import com.billbharat.sales.dto.request.SaleRequest;
 import com.billbharat.sales.dto.response.SaleResponse;
 import com.billbharat.sales.entity.Commission;
 import com.billbharat.sales.entity.Coupon;
+import com.billbharat.sales.entity.Product;
 import com.billbharat.sales.entity.Sale;
 import com.billbharat.sales.exception.BadRequestException;
 import com.billbharat.sales.exception.ResourceNotFoundException;
 import com.billbharat.sales.repository.CommissionRepository;
 import com.billbharat.sales.repository.CouponRepository;
+import com.billbharat.sales.repository.ProductRepository;
 import com.billbharat.sales.repository.SaleRepository;
 import com.billbharat.sales.service.SalesService;
 import com.billbharat.sales.util.DateUtil;
@@ -30,11 +32,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SalesServiceImpl implements SalesService {
 
-    private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.05"); // 5% commission
-
     private final SaleRepository saleRepository;
     private final CouponRepository couponRepository;
     private final CommissionRepository commissionRepository;
+    private final ProductRepository productRepository;
 
     @Override
     @Transactional
@@ -81,11 +82,36 @@ public class SalesServiceImpl implements SalesService {
         BigDecimal finalAmount = amount.subtract(discountAmount);
         String invoiceNumber = "INV-" + System.currentTimeMillis();
 
+        // Resolve product details if productId is provided
+        UUID productId = null;
+        String productName = null;
+        BigDecimal productPrice = null;
+        boolean hasCommission = false;
+        BigDecimal commissionAmount = BigDecimal.ZERO;
+
+        if (StringUtils.hasText(request.getProductId())) {
+            UUID pid = UUID.fromString(request.getProductId());
+            Product product = productRepository.findById(pid)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.getProductId()));
+            productId = product.getId();
+            productName = product.getName();
+            productPrice = product.getSellingPrice();
+            hasCommission = product.isHasCommission();
+            if (product.isHasCommission() && product.getCommissionAmount() != null) {
+                commissionAmount = product.getCommissionAmount();
+            }
+        }
+
         Sale sale = Sale.builder()
                 .userId(userId)
                 .merchantId(StringUtils.hasText(request.getMerchantId())
                         ? UUID.fromString(request.getMerchantId()) : null)
                 .couponId(couponId)
+                .productId(productId)
+                .productName(productName)
+                .productPrice(productPrice)
+                .hasCommission(hasCommission)
+                .commissionAmount(commissionAmount)
                 .amount(amount)
                 .discountAmount(discountAmount)
                 .finalAmount(finalAmount)
@@ -99,18 +125,23 @@ public class SalesServiceImpl implements SalesService {
 
         Sale savedSale = saleRepository.save(sale);
 
-        // Calculate and store commission
-        BigDecimal commissionAmount = finalAmount.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
-        Commission commission = Commission.builder()
-                .userId(userId)
-                .saleId(savedSale.getId())
-                .commissionType(Commission.CommissionType.SALE)
-                .baseAmount(finalAmount)
-                .commissionRate(COMMISSION_RATE.multiply(new BigDecimal("100")))
-                .commissionAmount(commissionAmount)
-                .status(Commission.Status.PENDING)
-                .build();
-        commissionRepository.save(commission);
+        // Record commission if applicable
+        if (hasCommission && commissionAmount.compareTo(BigDecimal.ZERO) > 0) {
+            // Commission rate stored as percentage of final amount for reporting
+            BigDecimal commissionRate = finalAmount.compareTo(BigDecimal.ZERO) > 0
+                    ? commissionAmount.divide(finalAmount, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"))
+                    : BigDecimal.ZERO;
+            Commission commission = Commission.builder()
+                    .userId(userId)
+                    .saleId(savedSale.getId())
+                    .commissionType(Commission.CommissionType.SALE)
+                    .baseAmount(finalAmount)
+                    .commissionRate(commissionRate)
+                    .commissionAmount(commissionAmount)
+                    .status(Commission.Status.PENDING)
+                    .build();
+            commissionRepository.save(commission);
+        }
 
         return SaleResponse.fromEntity(savedSale);
     }
@@ -147,3 +178,4 @@ public class SalesServiceImpl implements SalesService {
         return result;
     }
 }
+

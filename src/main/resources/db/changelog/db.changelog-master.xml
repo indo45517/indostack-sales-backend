@@ -24,5 +24,7 @@
     <include file="db/changelog/017-create-training-tables.xml"/>
     <include file="db/changelog/018-add-territory-boundaries.xml"/>
     <include file="db/changelog/019-add-user-profile-fields.xml"/>
+    <include file="db/changelog/020-create-products-table.xml"/>
+    <include file="db/changelog/021-add-product-fields-to-sales.xml"/>
 
 </databaseChangeLog>

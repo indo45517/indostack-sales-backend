@@ -18,6 +18,11 @@ public class SaleResponse {
     private String userId;
     private String merchantId;
     private String couponId;
+    private String productId;
+    private String productName;
+    private BigDecimal productPrice;
+    private boolean hasCommission;
+    private BigDecimal commissionAmount;
     private BigDecimal amount;
     private BigDecimal discountAmount;
     private BigDecimal finalAmount;
@@ -35,6 +40,11 @@ public class SaleResponse {
                 .userId(sale.getUserId().toString())
                 .merchantId(sale.getMerchantId() != null ? sale.getMerchantId().toString() : null)
                 .couponId(sale.getCouponId() != null ? sale.getCouponId().toString() : null)
+                .productId(sale.getProductId() != null ? sale.getProductId().toString() : null)
+                .productName(sale.getProductName())
+                .productPrice(sale.getProductPrice())
+                .hasCommission(sale.isHasCommission())
+                .commissionAmount(sale.getCommissionAmount())
                 .amount(sale.getAmount())
                 .discountAmount(sale.getDiscountAmount())
                 .finalAmount(sale.getFinalAmount())

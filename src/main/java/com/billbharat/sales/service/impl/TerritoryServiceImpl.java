@@ -52,6 +52,14 @@ public class TerritoryServiceImpl implements TerritoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public TerritoryResponse getTerritoryById(UUID id) {
+        Territory territory = territoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Territory", "id", id));
+        return TerritoryResponse.fromEntity(territory);
+    }
+
+    @Override
     @Transactional
     public TerritoryResponse createTerritory(TerritoryRequest request) {
         Territory territory = Territory.builder()

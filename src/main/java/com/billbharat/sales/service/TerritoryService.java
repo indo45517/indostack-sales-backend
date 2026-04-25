@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public interface TerritoryService {
     Page<TerritoryResponse> getTerritories(Pageable pageable);
+    TerritoryResponse getTerritoryById(UUID id);
     TerritoryResponse createTerritory(TerritoryRequest request);
     TerritoryResponse updateTerritory(UUID id, TerritoryRequest request);
     void deleteTerritory(UUID id);
