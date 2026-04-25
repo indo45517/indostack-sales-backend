@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-create-merchants" author="billbharat">
+        <createTable tableName="merchants">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="shop_name" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_name" type="VARCHAR(100)"/>
+            <column name="phone_number" type="VARCHAR(15)"/>
+            <column name="email" type="VARCHAR(100)"/>
+            <column name="address" type="TEXT"/>
+            <column name="latitude" type="DECIMAL(10,7)"/>
+            <column name="longitude" type="DECIMAL(10,7)"/>
+            <column name="shop_type" type="VARCHAR(20)"/>
+            <column name="assigned_executive_id" type="UUID"/>
+            <column name="territory_id" type="UUID"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="gst_number" type="VARCHAR(20)"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="merchants" indexName="idx_merchant_executive">
+            <column name="assigned_executive_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

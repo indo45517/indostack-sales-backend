@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-create-coupons" author="billbharat">
+        <createTable tableName="coupons">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount_value" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_order_value" type="DECIMAL(10,2)" defaultValueNumeric="0"/>
+            <column name="max_discount" type="DECIMAL(10,2)"/>
+            <column name="usage_limit" type="INTEGER"/>
+            <column name="used_count" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="valid_from" type="TIMESTAMP"/>
+            <column name="valid_until" type="TIMESTAMP"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

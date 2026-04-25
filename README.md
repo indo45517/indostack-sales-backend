@@ -24,16 +24,16 @@ This backend serves a React Native mobile application and provides:
 - **Lombok** (Reduce boilerplate)
 - **MapStruct** (Entity-DTO mapping)
 - **Springdoc OpenAPI** (Swagger documentation)
-- **Maven** (Dependency management)
+- **Gradle** (Dependency management)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Java 17 or higher
-- Maven 3.8+
 - Docker & Docker Compose
 - Git
+- (Gradle wrapper included - no installation required)
 
 ### 1. Clone the Repository
 
@@ -71,13 +71,21 @@ JWT_REFRESH_EXPIRATION=604800000
 ### 4. Build the Application
 
 ```bash
-mvn clean install
+# On Windows
+.\gradlew build
+
+# On Mac/Linux
+./gradlew build
 ```
 
 ### 5. Run the Application
 
 ```bash
-mvn spring-boot:run
+# On Windows
+.\gradlew bootRun
+
+# On Mac/Linux
+./gradlew bootRun
 ```
 
 The application will start on `http://localhost:8080`
@@ -299,26 +307,38 @@ src/main/java/com/billbharat/sales/
 
 Run unit tests:
 ```bash
-mvn test
+# On Windows
+.\gradlew test
+
+# On Mac/Linux
+./gradlew test
 ```
 
 Run integration tests:
 ```bash
-mvn verify
+# On Windows
+.\gradlew check
+
+# On Mac/Linux
+./gradlew check
 ```
 
 ## 📦 Building for Production
 
 ### Create executable JAR
 ```bash
-mvn clean package -DskipTests
+# On Windows
+.\gradlew bootJar -x test
+
+# On Mac/Linux
+./gradlew bootJar -x test
 ```
 
-The JAR file will be created at `target/billbharat-sales-backend-1.0.0.jar`
+The JAR file will be created at `build/libs/billbharat-sales-backend-1.0.0.jar`
 
 ### Run the JAR
 ```bash
-java -jar target/billbharat-sales-backend-1.0.0.jar
+java -jar build/libs/billbharat-sales-backend-1.0.0.jar
 ```
 
 ## 🚀 Deployment
